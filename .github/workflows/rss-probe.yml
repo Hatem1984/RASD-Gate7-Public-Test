@@ -12,13 +12,17 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect one public native publisher RSS feed
+      - name: Inspect Hapi public publisher RSS feed
         run: python feed_probe.py
+      - name: Inspect Youm7 economy RSS feed
+        run: python probe_youm7.py
       - name: Upload non-sensitive discovery evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gate9-public-rss-evidence
-          path: evidence/feed_probe.json
+          path: |
+            evidence/feed_probe.json
+            evidence/youm7_rss_probe.json
           if-no-files-found: warn
           retention-days: 1

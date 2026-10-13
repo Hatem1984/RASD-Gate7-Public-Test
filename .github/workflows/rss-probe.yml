@@ -1,0 +1,24 @@
+name: Gate 9 — public RSS discovery probe (manual only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rss-source-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect one public native publisher RSS feed
+        run: python feed_probe.py
+      - name: Upload non-sensitive discovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate9-public-rss-evidence
+          path: evidence/feed_probe.json
+          if-no-files-found: warn
+          retention-days: 1

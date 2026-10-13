@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
 from playwright.sync_api import sync_playwright
+from visual_check import assess_image
 
 TARGETS = (
     ("egypt_planning_official", "https://mped.gov.eg/singlenews?id=7248&lang=ar", {"mped.gov.eg", "www.mped.gov.eg"}),
@@ -56,6 +57,11 @@ with sync_playwright() as p:
                 if len(raw) < 8000 or raw[:2] != b"\xff\xd8":
                     path.unlink(missing_ok=True)
                     raise RuntimeError("screenshot_invalid")
+                visual = assess_image(path)
+                result["visual_qa"] = visual
+                if not visual["accepted"]:
+                    path.unlink(missing_ok=True)
+                    raise RuntimeError("screenshot_blank_or_unreadable")
                 result.update({
                     "captured": True,
                     "final_url": page.url,

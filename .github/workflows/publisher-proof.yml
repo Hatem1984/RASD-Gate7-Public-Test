@@ -1,0 +1,36 @@
+name: Gate 7 — public publisher screenshot (manual only)
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gate7-publisher-proof
+  cancel-in-progress: false
+
+jobs:
+  publisher-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Check out isolated public test
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Playwright and Chromium
+        run: |
+          python -m pip install "playwright>=1.50,<2"
+          python -m playwright install --with-deps chromium
+      - name: Capture real publisher pages (no emails, no secrets)
+        run: python capture_public.py
+      - name: Upload public-page screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate7-original-publisher-proof
+          path: evidence/
+          retention-days: 1
+          if-no-files-found: warn

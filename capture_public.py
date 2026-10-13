@@ -53,7 +53,7 @@ with sync_playwright() as p:
                 path = OUT / (label + ".jpg")
                 page.screenshot(path=str(path), type="jpeg", quality=80, full_page=False)
                 raw = path.read_bytes()
-                if len(raw) < 8000 or raw[:2] != b"\\xff\\xd8":
+                if len(raw) < 8000 or raw[:2] != b"\xff\xd8":
                     path.unlink(missing_ok=True)
                     raise RuntimeError("screenshot_invalid")
                 result.update({
